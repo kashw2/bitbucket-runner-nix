@@ -1,11 +1,17 @@
 # Bitbucket Runner Linux Shell Nix Module
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 with lib;
 
 let
-  bitbucketRunner = pkgs.callPackage ./package.nix {};
+  cfg = config.services.bitbucket-runner-linux-shell;
+  bitbucketRunner = pkgs.callPackage ./package.nix { };
 in
 {
   options = {
@@ -27,7 +33,7 @@ in
         default = "bitbucket-runner-linux-shell";
         description = "The group for the Bitbucket runner service";
       };
-      
+
       flags = {
         accountUuid = mkOption {
           type = types.str;
@@ -68,11 +74,11 @@ in
     };
   };
 
-  config = mkIf config.services.bitbucket-runner-linux-shell.enable {
+  config = mkIf cfg.enable {
     users.users = {
       "bitbucket-runner-linux-shell" = {
         description = "Bitbucket Runner Linux Shell user";
-        group = config.services.bitbucket-runner-linux-shell.group;
+        group = cfg.group;
         isSystemUser = true;
       };
     };
@@ -87,10 +93,10 @@ in
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         ExecStart = ''
-          ${bitbucketRunner}/bin/bitbucket-runner-linux-shell --accountUuid ${config.services.bitbucket-runner-linux-shell.flags.accountUuid} --repositoryUuid ${config.services.bitbucket-runner-linux-shell.flags.repositoryUuid} --runnerUuid ${config.services.bitbucket-runner-linux-shell.flags.runnerUuid} --OAuthClientId ${config.services.bitbucket-runner-linux-shell.flags.OAuthClientId} --OAuthClientSecret ${config.services.bitbucket-runner-linux-shell.flags.OAuthClientSecret} --runtime ${config.services.bitbucket-runner-linux-shell.flags.runtime} --workingDirectory ${config.services.bitbucket-runner-linux-shell.flags.workingDirectory} ${config.services.bitbucket-runner-linux-shell.flags.extraFlags}
+          ${bitbucketRunner}/bin/bitbucket-runner-linux-shell --accountUuid ${cfg.flags.accountUuid} --repositoryUuid ${cfg.flags.repositoryUuid} --runnerUuid ${cfg.flags.runnerUuid} --OAuthClientId ${cfg.flags.OAuthClientId} --OAuthClientSecret ${cfg.flags.OAuthClientSecret} --runtime ${cfg.flags.runtime} --workingDirectory ${cfg.flags.workingDirectory} ${cfg.flags.extraFlags}
         '';
-        User = config.services.bitbucket-runner-linux-shell.user;
-        Group = config.services.bitbucket-runner-linux-shell.group;
+        User = cfg.user;
+        Group = cfg.group;
         Restart = "on-failure";
       };
     };
