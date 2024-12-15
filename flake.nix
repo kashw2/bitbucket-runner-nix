@@ -15,6 +15,7 @@
     in
     {
       packages.${system} = with nixpkgs.legacyPackages.${system}.pkgs; {
+        default = bitbucket-runner;
         bitbucket-runner = import ./package.nix {
           inherit
             writeShellScript
