@@ -1,5 +1,5 @@
 {
-  description = "Nix Bitbucket Runner Linux Shell";
+  description = "Nix Bitbucket Runner";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
@@ -21,13 +21,9 @@
             writeShellScript
             fetchzip
             buildFHSEnv
-            pkgs;
+            ;
         };
       };
-      nixosModules = with nixpkgs.legacyPackages.${system}.pkgs; {
-        bitbucket-runner = import ./default.nix {
-          inherit lib pkgs config;
-        };
-      };
+      nixosModules.bitbucket-runner.imports = [ ./default.nix ];
     };
 }
