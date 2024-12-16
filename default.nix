@@ -83,9 +83,7 @@ in
       };
     };
 
-    users.groups = {
-      "bitbucket-runner-linux-shell" = {};
-    };
+    users.groups.${cfg.group} = { };
 
     systemd.services.bitbucket-runner-linux-shell = {
       description = "Bitbucket Runner Linux Shell Service";
