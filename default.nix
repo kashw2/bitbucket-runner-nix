@@ -93,7 +93,14 @@ in
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         ExecStart = ''
-          ${bitbucketRunner}/bin/bitbucket-runner-linux-shell --accountUuid ${cfg.flags.accountUuid} --repositoryUuid ${cfg.flags.repositoryUuid} --runnerUuid ${cfg.flags.runnerUuid} --OAuthClientId ${cfg.flags.OAuthClientId} --OAuthClientSecret ${cfg.flags.OAuthClientSecret} --runtime ${cfg.flags.runtime} --workingDirectory ${cfg.flags.workingDirectory} ${cfg.flags.extraFlags}
+          ${bitbucketRunner}/bin/bitbucket-runner \
+            --accountUuid {${cfg.flags.accountUuid}} \
+            --repositoryUuid {${cfg.flags.repositoryUuid}} \
+            --runnerUuid {${cfg.flags.runnerUuid}} \
+            --OAuthClientId ${cfg.flags.OAuthClientId} \
+            --OAuthClientSecret ${cfg.flags.OAuthClientSecret} \
+            --runtime ${cfg.flags.runtime} \
+            --workingDirectory ${cfg.flags.workingDirectory}
         '';
         User = cfg.user;
         Group = cfg.group;
