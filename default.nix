@@ -75,12 +75,10 @@ in
   };
 
   config = mkIf cfg.enable {
-    users.users = {
-      "bitbucket-runner-linux-shell" = {
-        description = "Bitbucket Runner Linux Shell user";
-        group = cfg.group;
-        isSystemUser = true;
-      };
+    users.users.${cfg.user} = {
+      description = "Bitbucket Runner Linux Shell User";
+      group = cfg.group;
+      isSystemUser = true;
     };
 
     users.groups.${cfg.group} = { };
