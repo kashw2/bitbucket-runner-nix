@@ -1,4 +1,4 @@
-# Nix Bitbucket Runner Linux Shell
+# Bitbucket Runner Nix
 
 A NixOS Package and Module that exposes the Bitbucket Runner as a Systemd Service via Nix.
 
@@ -7,13 +7,13 @@ A NixOS Package and Module that exposes the Bitbucket Runner as a Systemd Servic
 1) Add the following to your flake.nix inputs:
 
 ```nix
-bitbucket-runner-linux-shell.url = "github:MNRMax/nix-bitbucket-runner-linux-shell";
+bitbucket-runner-nix.url = "github:kashw2/bitbucket-runner-nix";
 ```
 
 2) Add the following to your flake.nix's nixosConfiguration configuration module:
 
 ```nix
-bitbucket-runner-linux-shell.nixosModules.bitbucket-runner;
+bitbucket-runner-nix.nixosModules.bitbucket-runner;
 ```
 
 3) Add the following to your configuration.nix:
