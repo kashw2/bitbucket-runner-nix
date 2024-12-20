@@ -19,6 +19,7 @@ buildFHSEnv {
       jre
       bash
       git
+      util-linux
     ]);
   runScript = writeShellScript "bitbucket-runner-linux-shell-start" ''
     cd "${src}/bin"
