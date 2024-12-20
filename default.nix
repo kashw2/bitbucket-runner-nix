@@ -85,7 +85,7 @@ in
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         ExecStart = ''
-          ${bitbucketRunner}/bin/bitbucket-runner \
+          ${bitbucketRunner}/bin/bitbucket-runner-linux-shell \
             --accountUuid {${cfg.flags.accountUuid}} \
             --repositoryUuid {${cfg.flags.repositoryUuid}} \
             --runnerUuid {${cfg.flags.runnerUuid}} \
