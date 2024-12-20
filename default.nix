@@ -79,7 +79,11 @@ in
     users.users.${cfg.user} = {
       description = "Bitbucket Runner Linux Shell User";
       group = cfg.group;
-      isSystemUser = true;
+      # For certain File System actions, the runner may need an actual user
+      # An example is Nix operations (eg Colmena, deploy-rs etc)
+      isNormalUser = true;
+      createHome = true;
+      home = "/home/${cfg.user}";
     };
 
     users.groups.${cfg.group} = { };
