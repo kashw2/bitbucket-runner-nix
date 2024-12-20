@@ -68,6 +68,11 @@ in
         description = "Additional flags to pass to the Bitbucket runner";
       };
     };
+    extraPackages = mkOption {
+      type = types.listOf types.package;
+      description = "Additional packages to make available to pipelines";
+      default = [ ];
+    };
   };
 
   config = mkIf cfg.enable {
@@ -83,6 +88,7 @@ in
       description = "Bitbucket Runner Service";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
+      path = cfg.extraPackages;
       serviceConfig = {
         ExecStart = ''
           ${bitbucketRunner}/bin/bitbucket-runner-linux-shell \
