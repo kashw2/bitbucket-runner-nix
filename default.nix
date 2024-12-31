@@ -18,19 +18,16 @@ in
 
   options.services.bitbucket-runner = {
     enable = mkEnableOption "bitbucket-runner";
-
     user = mkOption {
       type = types.str;
       default = "bitbucket-runner";
       description = "The user that runs the Bitbucket runner service";
     };
-
     group = mkOption {
       type = types.str;
       default = "bitbucket-runner";
       description = "The group for the Bitbucket runner service";
     };
-
     flags = {
       accountUuid = mkOption {
         type = types.str;
@@ -58,7 +55,10 @@ in
         description = "The working directory for the Bitbucket runner";
       };
       runtime = mkOption {
-        type = types.str;
+        type = types.enum [
+          "linux-shell"
+          "linux-docker"
+        ];
         default = "linux-shell";
         description = "The runtime environment for the Bitbucket runner";
       };
@@ -88,7 +88,7 @@ in
 
     users.groups.${cfg.group} = { };
 
-    systemd.services.bitbucket-runner = {
+    systemd.services.bitbucket-runner = mkIf (cfg.flags.runtime == "linux-shell") {
       description = "Bitbucket Runner Service";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
@@ -107,6 +107,26 @@ in
         User = cfg.user;
         Group = cfg.group;
         Restart = "on-failure";
+      };
+    };
+
+    virtualisation.oci-containers = mkIf (cfg.flags.runtime == "linux-docker") {
+      backend = "docker";
+      containers = {
+        bitbucket-runner = {
+          image = "docker-public.packages.atlassian.com/sox/atlassian/bitbucket-pipelines-runner";
+          volumes = [
+            "/tmp:${cfg.flags.workingDirectory}"
+          ];
+          environment = {
+            ACCOUNT_UUID = cfg.flags.accountUuid;
+            REPOSITORY_UUID = cfg.flags.repositoryUuid;
+            RUNNER_UUID = cfg.flags.runnerUuid;
+            OAUTH_CLIENT_ID = cfg.flags.OAuthClientId;
+            OAUTH_CLIENT_SECRET = cfg.flags.OAuthClientSecret;
+            WORKING_DIRECTORY = cfg.flags.workingDirectory;
+          };
+        };
       };
     };
   };
