@@ -4,7 +4,7 @@
   buildFHSEnv,
 }:
 let
-  version = "3.10.0";
+  version = "3.15.0";
   src = fetchzip {
     url = "https://product-downloads.atlassian.com/software/bitbucket/pipelines/atlassian-bitbucket-pipelines-runner-${version}.tar.gz";
     stripRoot = false;
