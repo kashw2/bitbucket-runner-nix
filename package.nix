@@ -7,8 +7,8 @@ let
   version = "3.15.0";
   src = fetchzip {
     url = "https://product-downloads.atlassian.com/software/bitbucket/pipelines/atlassian-bitbucket-pipelines-runner-${version}.tar.gz";
+    hash = "sha256-Hz6yZpnE4W0ZVse7+pKhPaUsOTfH8IQ10EGzNdkpkv8=";
     stripRoot = false;
-    hash = "sha256-nFRh6hy49Vg8dMfD0ZPyu9ZGuWaLtmxcPXaDl5ePFeM=";
   };
 in
 buildFHSEnv {
