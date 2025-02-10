@@ -15,7 +15,13 @@
     in
     {
       packages.${system} = with nixpkgs.legacyPackages.${system}.pkgs; {
-        default = bitbucket-runner;
+        default = import ./package.nix {
+          inherit
+            writeShellScript
+            fetchzip
+            buildFHSEnv
+            ;
+        };
         bitbucket-runner = import ./package.nix {
           inherit
             writeShellScript
