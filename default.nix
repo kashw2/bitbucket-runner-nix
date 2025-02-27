@@ -34,8 +34,9 @@ in
         description = "The account UUID for the Bitbucket runner";
       };
       repositoryUuid = mkOption {
-        type = types.str;
+        type = types.nullOr types.str;
         description = "The repository UUID for the Bitbucket runner";
+        default = null;
       };
       runnerUuid = mkOption {
         type = types.str;
@@ -97,12 +98,12 @@ in
         ExecStart = ''
           ${bitbucketRunner}/bin/bitbucket-runner-linux-shell \
             --accountUuid {${cfg.flags.accountUuid}} \
-            --repositoryUuid {${cfg.flags.repositoryUuid}} \
             --runnerUuid {${cfg.flags.runnerUuid}} \
             --OAuthClientId ${cfg.flags.OAuthClientId} \
             --OAuthClientSecret ${cfg.flags.OAuthClientSecret} \
             --runtime ${cfg.flags.runtime} \
-            --workingDirectory ${cfg.flags.workingDirectory}
+            --workingDirectory ${cfg.flags.workingDirectory} \
+            ${lib.optionalString (cfg.flags.repositoryUuid != null) "--repositoryUuid {${cfg.flags.repositoryUuid}}"}
         '';
         User = cfg.user;
         Group = cfg.group;
