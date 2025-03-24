@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - flake.nix
+      - "**/*.nix"
+      - ".github/workflows/nix.yml"
       - flake.lock
 
 env:
