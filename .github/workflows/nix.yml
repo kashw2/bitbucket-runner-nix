@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - flake.nix
+      - "**/*.nix"
+      - ".github/workflows/nix.yml"
       - flake.lock
 
 env:
@@ -35,3 +36,14 @@ jobs:
 
       - name: build
         run: nix build .#default --print-out-paths --json
+  shell:
+    name: "Run Package"
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+
+      - name: run
+        run: nix shell .#default --command sh -c "exit"
