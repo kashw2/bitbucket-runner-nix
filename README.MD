@@ -22,7 +22,7 @@ bitbucket-runner-nix.nixosModules.bitbucket-runner;
 
 ```nix
 services.bitbucket-runner = {
-    enable = true
+    enable = true;
     flags = {
         accountUuid = "YOUR UUID";
         repositoryUuid = "YOUR REPOSITORY UUID";
