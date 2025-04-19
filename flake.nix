@@ -16,7 +16,7 @@
     {
       packages.${system} = {
         default = self.outputs.packages.${system}.bitbucket-runner;
-        bitbucket-runner = nixpkgs.legacyPackages.${system}.pkgs.callPackage ./package.nix {};
+        bitbucket-runner = nixpkgs.legacyPackages.${system}.pkgs.callPackage ./package.nix { };
       };
       nixosModules.bitbucket-runner.imports = [ ./default.nix ];
     };

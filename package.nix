@@ -3,7 +3,8 @@
   fetchzip,
   retry,
   writeScriptBin,
-  writeShellScript
+  writeShellScript,
+  extraPkgs ? [ ],
 }:
 let
   version = "3.16.0";
@@ -29,9 +30,10 @@ buildFHSEnv {
       bash
       git
       util-linux
-      nix  # run nix commands as part of pipeline.
+      nix # run nix commands as part of pipeline.
       retry-workaround
-    ]);
+    ])
+    ++ extraPkgs;
   runScript = writeShellScript "bitbucket-runner-linux-shell-start" ''
     cd "${src}/bin"
     exec bash ./start.sh "$@"
