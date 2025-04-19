@@ -4,6 +4,8 @@ A NixOS Package and Module that exposes the Bitbucket Runner as a Systemd Servic
 
 # Usage
 
+## As a Systemd Service
+
 1) Add the following to your flake.nix inputs:
 
 ```nix
@@ -30,3 +32,17 @@ services.bitbucket-runner = {
     };
 };
 ```
+
+## Invoked via shell
+
+```shell
+nix shell github:kashw2/bitbucket-runner-nix#bitbucket-runner \ 
+    -c sh \
+    -c "bitbucket-runner-linux-shell \ 
+    --accountUuid A \
+    --runnerUuid B \
+    --OAuthClientId C \
+    --OAuthClientSecret D \
+    --workingDirectory E \
+    --runtime linux-shell"
+ ```
