@@ -2,6 +2,8 @@
 
 A NixOS Package and Module that exposes the Bitbucket Runner as a Systemd Service via Nix.
 
+[![Nix](https://github.com/kashw2/bitbucket-runner-nix/actions/workflows/nix.yml/badge.svg)](https://github.com/kashw2/bitbucket-runner-nix/actions/workflows/nix.yml)
+
 ---
 
 # Usage
