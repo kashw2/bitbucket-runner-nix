@@ -1,9 +1,7 @@
 {
   description = "Nix Bitbucket Runner";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
   outputs =
     inputs@{
