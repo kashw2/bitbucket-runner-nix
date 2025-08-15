@@ -26,15 +26,30 @@ bitbucket-runner-nix.nixosModules.bitbucket-runner;
 
 ```nix
 services.bitbucket-runner = {
-    enable = true;
-    flags = {
-        accountUuid = "YOUR UUID";
-        repositoryUuid = "YOUR REPOSITORY UUID";
-        runnerUuid = "YOUR RUNNER UUID";
-        OAuthClientId = "YOUR OAUTH CLIENT ID";
-        OAuthClientSecret = "YOUR OAUTH CLIENT SECRET";
+    bitbucket-runner = {
+      enable = true;
+      user = "bitbucket-runner";
+      group = "bitbucket-runner"; # Optional if default
+      extraPackages = [
+        pkgs.terraform
+      ];
+      runners = {
+        runner-1 = {
+          accountUuid = "YOUR ACCOUNT UUID";
+          runnerUuid = "YOUR RUNNER UUID";
+          OAuthClientId = "YOUR OAUTH CLIENT ID";
+          OAuthClientSecret = "YOUR OAUTH CLIENT SECRET";
+          runtime = "linux-shell";
+        };
+        runner-2 = {
+          accountUuid = "YOUR ACCOUNT UUID";
+          runnerUuid = "YOUR RUNNER UUID";
+          OAuthClientId = "YOUR OAUTH CLIENT ID";
+          OAuthClientSecret = "YOUR OAUTH CLIENT SECRET"; 
+          runtime = "linux-docker";
+        };
+      };
     };
-};
 ```
 
 ### Invoked via shell
