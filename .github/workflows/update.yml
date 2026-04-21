@@ -1,0 +1,25 @@
+name: Update
+on:
+  schedule:
+    - cron: 0 6 * * 1 # Weekly
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - uses: cachix/install-nix-action@v30
+      - run: nix run nixpkgs#nix-update -- --flake --use-update-script bitbucket-runner
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          branch: update/bitbucket-runner
+          delete-branch: true
+          commit-message: 'build(package): update bitbucket-runner'
+          title: 'build(package): update bitbucket-runner'
+          body: Automated update via `nix-update` (`passthru.updateScript`).
