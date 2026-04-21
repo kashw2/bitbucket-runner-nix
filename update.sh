@@ -12,7 +12,8 @@ else
 fi
 
 echo "Fetching changelog..."
-version=$(curl -sSf "$CHANGELOG_URL" | grep -m1 -oP '^## \K[0-9]+\.[0-9]+\.[0-9]+')
+changelog=$(curl -sSf "$CHANGELOG_URL")
+version=$(printf '%s' "$changelog" | grep -m1 -oP '^## \K[0-9]+\.[0-9]+\.[0-9]+')
 
 if [[ -z "$version" ]]; then
   echo "Failed to extract version from changelog" >&2
