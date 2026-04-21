@@ -22,6 +22,7 @@ let
   '';
 in
 buildFHSEnv {
+  pname = "bitbucket-runner-linux-shell";
   name = "bitbucket-runner-linux-shell";
   targetPkgs =
     pkgs:
@@ -34,8 +35,13 @@ buildFHSEnv {
       retry-workaround
     ])
     ++ extraPkgs;
+  passthru = {
+    inherit version;
+    updateScript = ./update.sh;
+  };
   runScript = writeShellScript "bitbucket-runner-linux-shell-start" ''
     cd "${src}/bin"
     exec bash ./start.sh "$@"
   '';
+
 }
