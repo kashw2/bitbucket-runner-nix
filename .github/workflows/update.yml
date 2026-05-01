@@ -19,7 +19,7 @@ jobs:
       - run: nix develop --command nix-update --flake bitbucket-runner --use-update-script --no-src
       - if: ${{ env.ACT }}
         run: git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GH_TOKEN }}
           branch: update/bitbucket-runner
