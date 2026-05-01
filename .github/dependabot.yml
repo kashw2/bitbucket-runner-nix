@@ -6,3 +6,7 @@ updates:
       default-days: 14
     schedule:
       interval: weekly
+  - package-ecosystem: nix
+    directory: /
+    schedule:
+      interval: monthly
