@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31.10.5
 
       - name: check
         run: nix flake check --impure
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31.10.5
 
       - name: build
         run: nix build .#default --print-out-paths --json
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31.10.5
 
       - name: run
         run: nix shell .#default --command sh -c "exit"
