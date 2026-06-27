@@ -17,7 +17,7 @@ in
   imports = [ ];
 
   options.services.bitbucket-runner = {
-    enable = mkEnableOption "Enable Bitbucket runner module";
+    enable = mkEnableOption "Bitbucket runner module";
 
     user = mkOption {
       type = types.str;
