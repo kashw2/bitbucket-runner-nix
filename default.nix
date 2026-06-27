@@ -7,76 +7,72 @@
   ...
 }:
 
-with lib;
-
 let
   cfg = config.services.bitbucket-runner;
   bitbucketRunner = pkgs.callPackage ./package.nix { };
 in
 {
-  imports = [ ];
-
   options.services.bitbucket-runner = {
-    enable = mkEnableOption "Bitbucket runner module";
+    enable = lib.mkEnableOption "Bitbucket runner module";
 
-    user = mkOption {
-      type = types.str;
+    user = lib.mkOption {
+      type = lib.types.str;
       default = "bitbucket-runner";
       description = "User to run Bitbucket runners";
     };
 
-    group = mkOption {
-      type = types.str;
+    group = lib.mkOption {
+      type = lib.types.str;
       default = "bitbucket-runner";
       description = "Group for Bitbucket runners";
     };
 
-    extraPackages = mkOption {
-      type = types.listOf types.package;
+    extraPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
       default = [ ];
       description = "Packages available to runner environments";
     };
 
-    runners = mkOption {
-      type = types.attrsOf (
-        types.submodule {
+    runners = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
           options = {
-            accountUuid = mkOption {
-              type = types.str;
+            accountUuid = lib.mkOption {
+              type = lib.types.str;
               description = "Account UUID";
             };
-            repositoryUuid = mkOption {
-              type = types.nullOr types.str;
+            repositoryUuid = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
               default = null;
               description = "Repository UUID";
             };
-            runnerUuid = mkOption {
-              type = types.str;
+            runnerUuid = lib.mkOption {
+              type = lib.types.str;
               description = "Runner UUID";
             };
-            OAuthClientId = mkOption {
-              type = types.str;
+            OAuthClientId = lib.mkOption {
+              type = lib.types.str;
               description = "OAuth Client ID";
             };
-            OAuthClientSecret = mkOption {
-              type = types.str;
+            OAuthClientSecret = lib.mkOption {
+              type = lib.types.str;
               description = "OAuth Client Secret";
             };
-            workingDirectory = mkOption {
-              type = types.str;
+            workingDirectory = lib.mkOption {
+              type = lib.types.str;
               default = "/tmp";
               description = "Working directory";
             };
-            runtime = mkOption {
-              type = types.enum [
+            runtime = lib.mkOption {
+              type = lib.types.enum [
                 "linux-shell"
                 "linux-docker"
               ];
               default = "linux-shell";
               description = "Runtime environment";
             };
-            extraFlags = mkOption {
-              type = types.str;
+            extraFlags = lib.mkOption {
+              type = lib.types.str;
               default = "";
               description = "Extra flags";
             };
@@ -88,7 +84,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     users.users.${cfg.user} = {
       isNormalUser = true;
       createHome = true;
@@ -111,7 +107,7 @@ in
           "--workingDirectory ${runner.workingDirectory}"
         ] ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}";
       in
-      nameValuePair "bitbucket-runner-${name}" {
+      lib.nameValuePair "bitbucket-runner-${name}" {
         description = "Bitbucket Runner ${name}";
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
@@ -123,11 +119,11 @@ in
           Restart = "on-failure";
         };
       }
-    ) (filterAttrs (_: runner: runner.runtime == "linux-shell") cfg.runners);
+    ) (lib.filterAttrs (_: runner: runner.runtime == "linux-shell") cfg.runners);
 
     virtualisation.oci-containers.containers = lib.mapAttrs' (
       name: runner:
-      nameValuePair "bitbucket-runner-${name}" {
+      lib.nameValuePair "bitbucket-runner-${name}" {
         image = "docker-public.packages.atlassian.com/sox/atlassian/bitbucket-pipelines-runner";
         volumes = [ "/tmp:${runner.workingDirectory}" ];
         environment =
@@ -142,7 +138,7 @@ in
             REPOSITORY_UUID = runner.repositoryUuid;
           };
       }
-    ) (filterAttrs (_: runner: runner.runtime == "linux-docker") cfg.runners);
+    ) (lib.filterAttrs (_: runner: runner.runtime == "linux-docker") cfg.runners);
   };
 
 }
