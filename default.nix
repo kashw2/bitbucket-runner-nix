@@ -185,7 +185,7 @@ in
             RUNNER_UUID = runner.runnerUuid;
             WORKING_DIRECTORY = runner.workingDirectory;
           }
-          // lib.optionalAttrs (runner.OAuthClientId != null) {
+          // lib.optionalAttrs (runner.OAuthClientId != null && runner.OAuthClientSecret != null) {
             OAUTH_CLIENT_ID = runner.OAuthClientId;
             OAUTH_CLIENT_SECRET = runner.OAuthClientSecret;
           }
