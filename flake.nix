@@ -9,20 +9,25 @@
       nixpkgs,
     }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system}.pkgs;
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
-      packages.${system} = {
+      packages = forAllSystems (system: {
         default = self.outputs.packages.${system}.bitbucket-runner;
-        bitbucket-runner = pkgs.callPackage ./package.nix { };
-      };
-      devShells.${system}.default = pkgs.mkShell {
-        packages = [
-          pkgs.nix-update
-          pkgs.git
-        ];
-      };
+        bitbucket-runner = nixpkgs.legacyPackages.${system}.callPackage ./package.nix { };
+      });
+      devShells = forAllSystems (system: {
+        default = nixpkgs.legacyPackages.${system}.mkShell {
+          packages = [
+            nixpkgs.legacyPackages.${system}.nix-update
+            nixpkgs.legacyPackages.${system}.git
+          ];
+        };
+      });
       nixosModules.bitbucket-runner.imports = [ ./default.nix ];
     };
 }
