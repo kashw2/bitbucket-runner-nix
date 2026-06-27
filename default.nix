@@ -152,7 +152,8 @@ in
             "--runtime ${runner.runtime}"
             "--workingDirectory ${runner.workingDirectory}"
           ]
-          ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}";
+          ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}"
+          ++ lib.optional (runner.extraFlags != "") runner.extraFlags;
       in
       lib.nameValuePair "bitbucket-runner-${name}" {
         description = "Bitbucket Runner ${name}";
