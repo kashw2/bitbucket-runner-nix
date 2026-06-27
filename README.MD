@@ -34,7 +34,7 @@ services.bitbucket-runner = {
     pkgs.nodejs
     pkgs.go
     pkgs.gcc
-  ];
+  ]; # Optional
   runners = {
     runner-1 = {
       accountUuid = "YOUR ACCOUNT UUID";
