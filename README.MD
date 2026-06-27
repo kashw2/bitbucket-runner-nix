@@ -57,9 +57,9 @@ services.bitbucket-runner = {
 ### Invoked via shell
 
 ```shell
-nix shell github:kashw2/bitbucket-runner-nix#bitbucket-runner \ 
+nix shell github:kashw2/bitbucket-runner-nix#bitbucket-runner \
     -c sh \
-    -c "bitbucket-runner-linux-shell \ 
+    -c "bitbucket-runner-linux-shell \
     --accountUuid A \
     --runnerUuid B \
     --OAuthClientId C \
