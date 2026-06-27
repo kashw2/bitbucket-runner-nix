@@ -51,12 +51,28 @@ in
               description = "Runner UUID";
             };
             OAuthClientId = lib.mkOption {
-              type = lib.types.str;
-              description = "OAuth Client ID";
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "OAuth Client ID. Prefer environmentFile to avoid secrets landing in the Nix store.";
             };
             OAuthClientSecret = lib.mkOption {
-              type = lib.types.str;
-              description = "OAuth Client Secret";
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "OAuth Client Secret. Prefer environmentFile to avoid secrets landing in the Nix store.";
+            };
+            environmentFile = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = ''
+                Path to a file containing OAuth credentials in KEY=VALUE format:
+
+                  OAUTH_CLIENT_ID=your-client-id
+                  OAUTH_CLIENT_SECRET=your-client-secret
+
+                Provision this file outside the Nix store using a secrets
+                manager such as agenix or sops-nix. Mutually exclusive with
+                OAuthClientId and OAuthClientSecret.
+              '';
             };
             workingDirectory = lib.mkOption {
               type = lib.types.str;
@@ -85,6 +101,23 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = lib.concatLists (
+      lib.mapAttrsToList (name: runner: [
+        {
+          assertion =
+            runner.environmentFile != null
+            || (runner.OAuthClientId != null && runner.OAuthClientSecret != null);
+          message = "bitbucket-runner: runner '${name}' must set either environmentFile or both OAuthClientId and OAuthClientSecret.";
+        }
+        {
+          assertion =
+            runner.environmentFile == null
+            || (runner.OAuthClientId == null && runner.OAuthClientSecret == null);
+          message = "bitbucket-runner: runner '${name}' cannot set environmentFile together with OAuthClientId or OAuthClientSecret.";
+        }
+      ]) cfg.runners
+    );
+
     users.users.${cfg.user} = {
       isNormalUser = true;
       createHome = true;
@@ -98,26 +131,44 @@ in
     systemd.services = lib.mapAttrs' (
       name: runner:
       let
-        execArgs = [
-          "--accountUuid {${runner.accountUuid}}"
-          "--runnerUuid {${runner.runnerUuid}}"
-          "--OAuthClientId ${runner.OAuthClientId}"
-          "--OAuthClientSecret ${runner.OAuthClientSecret}"
-          "--runtime ${runner.runtime}"
-          "--workingDirectory ${runner.workingDirectory}"
-        ] ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}";
+        oauthArgs =
+          if runner.environmentFile != null then
+            [
+              "--OAuthClientId $OAUTH_CLIENT_ID"
+              "--OAuthClientSecret $OAUTH_CLIENT_SECRET"
+            ]
+          else
+            [
+              "--OAuthClientId ${runner.OAuthClientId}"
+              "--OAuthClientSecret ${runner.OAuthClientSecret}"
+            ];
+        execArgs =
+          [
+            "--accountUuid {${runner.accountUuid}}"
+            "--runnerUuid {${runner.runnerUuid}}"
+          ]
+          ++ oauthArgs
+          ++ [
+            "--runtime ${runner.runtime}"
+            "--workingDirectory ${runner.workingDirectory}"
+          ]
+          ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}";
       in
       lib.nameValuePair "bitbucket-runner-${name}" {
         description = "Bitbucket Runner ${name}";
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         path = cfg.extraPackages;
-        serviceConfig = {
-          ExecStart = "${bitbucketRunner}/bin/bitbucket-runner-linux-shell ${lib.concatStringsSep " " execArgs}";
-          User = cfg.user;
-          Group = cfg.group;
-          Restart = "on-failure";
-        };
+        serviceConfig =
+          {
+            ExecStart = "${bitbucketRunner}/bin/bitbucket-runner-linux-shell ${lib.concatStringsSep " " execArgs}";
+            User = cfg.user;
+            Group = cfg.group;
+            Restart = "on-failure";
+          }
+          // lib.optionalAttrs (runner.environmentFile != null) {
+            EnvironmentFile = runner.environmentFile;
+          };
       }
     ) (lib.filterAttrs (_: runner: runner.runtime == "linux-shell") cfg.runners);
 
@@ -126,13 +177,16 @@ in
       lib.nameValuePair "bitbucket-runner-${name}" {
         image = "docker-public.packages.atlassian.com/sox/atlassian/bitbucket-pipelines-runner";
         volumes = [ "/tmp:${runner.workingDirectory}" ];
+        environmentFiles = lib.optional (runner.environmentFile != null) runner.environmentFile;
         environment =
           {
             ACCOUNT_UUID = runner.accountUuid;
             RUNNER_UUID = runner.runnerUuid;
+            WORKING_DIRECTORY = runner.workingDirectory;
+          }
+          // lib.optionalAttrs (runner.OAuthClientId != null) {
             OAUTH_CLIENT_ID = runner.OAuthClientId;
             OAUTH_CLIENT_SECRET = runner.OAuthClientSecret;
-            WORKING_DIRECTORY = runner.workingDirectory;
           }
           // lib.optionalAttrs (runner.repositoryUuid != null) {
             REPOSITORY_UUID = runner.repositoryUuid;
