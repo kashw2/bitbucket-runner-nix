@@ -26,30 +26,32 @@ bitbucket-runner-nix.nixosModules.bitbucket-runner;
 
 ```nix
 services.bitbucket-runner = {
-    bitbucket-runner = {
-      enable = true;
-      user = "bitbucket-runner";
-      group = "bitbucket-runner"; # Optional if default
-      extraPackages = [
-        pkgs.terraform
-      ];
-      runners = {
-        runner-1 = {
-          accountUuid = "YOUR ACCOUNT UUID";
-          runnerUuid = "YOUR RUNNER UUID";
-          OAuthClientId = "YOUR OAUTH CLIENT ID";
-          OAuthClientSecret = "YOUR OAUTH CLIENT SECRET";
-          runtime = "linux-shell";
-        };
-        runner-2 = {
-          accountUuid = "YOUR ACCOUNT UUID";
-          runnerUuid = "YOUR RUNNER UUID";
-          OAuthClientId = "YOUR OAUTH CLIENT ID";
-          OAuthClientSecret = "YOUR OAUTH CLIENT SECRET"; 
-          runtime = "linux-docker";
-        };
-      };
+  enable = true;
+  user = "bitbucket-runner"; # Optional
+  group = "bitbucket-runner"; # Optional
+  extraPackages = [
+    pkgs.terraform
+    pkgs.nodejs
+    pkgs.go
+    pkgs.gcc
+  ];
+  runners = {
+    runner-1 = {
+      accountUuid = "YOUR ACCOUNT UUID";
+      runnerUuid = "YOUR RUNNER 1 UUID";
+      OAuthClientId = "YOUR OAUTH CLIENT ID";
+      OAuthClientSecret = "YOUR OAUTH CLIENT SECRET";
+      runtime = "linux-shell";
     };
+    runner-2 = {
+      accountUuid = "YOUR ACCOUNT UUID";
+      runnerUuid = "YOUR RUNNER 2 UUID";
+      OAuthClientId = "YOUR OAUTH CLIENT ID";
+      OAuthClientSecret = "YOUR OAUTH CLIENT SECRET";
+      runtime = "linux-docker";
+    };
+  };
+};
 ```
 
 ### Invoked via shell
