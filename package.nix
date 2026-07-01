@@ -27,7 +27,7 @@ buildFHSEnv {
   targetPkgs =
     pkgs:
     (with pkgs; [
-      jre
+      jdk25
       bash
       git
       util-linux
