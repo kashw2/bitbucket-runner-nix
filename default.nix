@@ -9,7 +9,7 @@
 
 let
   cfg = config.services.bitbucket-runner;
-  bitbucketRunner = pkgs.callPackage ./package.nix { };
+  bitbucketRunner = pkgs.callPackage ./package.nix { extraPkgs = cfg.extraFHSPackages; };
 in
 {
   options.services.bitbucket-runner = {
@@ -30,7 +30,19 @@ in
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
-      description = "Packages available to runner environments";
+      description = "Packages on the runner service PATH (outside the FHS sandbox).";
+    };
+
+    extraFHSPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Extra packages inside the linux-shell FHS sandbox.";
+    };
+
+    environment = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = "Env vars set on every runner.";
     };
 
     runners = lib.mkOption {
@@ -142,34 +154,33 @@ in
               "--OAuthClientId ${runner.OAuthClientId}"
               "--OAuthClientSecret ${runner.OAuthClientSecret}"
             ];
-        execArgs =
-          [
-            "--accountUuid {${runner.accountUuid}}"
-            "--runnerUuid {${runner.runnerUuid}}"
-          ]
-          ++ oauthArgs
-          ++ [
-            "--runtime ${runner.runtime}"
-            "--workingDirectory ${runner.workingDirectory}"
-          ]
-          ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}"
-          ++ lib.optional (runner.extraFlags != "") runner.extraFlags;
+        execArgs = [
+          "--accountUuid {${runner.accountUuid}}"
+          "--runnerUuid {${runner.runnerUuid}}"
+        ]
+        ++ oauthArgs
+        ++ [
+          "--runtime ${runner.runtime}"
+          "--workingDirectory ${runner.workingDirectory}"
+        ]
+        ++ lib.optional (runner.repositoryUuid != null) "--repositoryUuid {${runner.repositoryUuid}}"
+        ++ lib.optional (runner.extraFlags != "") runner.extraFlags;
       in
       lib.nameValuePair "bitbucket-runner-${name}" {
         description = "Bitbucket Runner ${name}";
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         path = cfg.extraPackages;
-        serviceConfig =
-          {
-            ExecStart = "${bitbucketRunner}/bin/bitbucket-runner-linux-shell ${lib.concatStringsSep " " execArgs}";
-            User = cfg.user;
-            Group = cfg.group;
-            Restart = "on-failure";
-          }
-          // lib.optionalAttrs (runner.environmentFile != null) {
-            EnvironmentFile = runner.environmentFile;
-          };
+        environment = cfg.environment;
+        serviceConfig = {
+          ExecStart = "${bitbucketRunner}/bin/bitbucket-runner-linux-shell ${lib.concatStringsSep " " execArgs}";
+          User = cfg.user;
+          Group = cfg.group;
+          Restart = "on-failure";
+        }
+        // lib.optionalAttrs (runner.environmentFile != null) {
+          EnvironmentFile = runner.environmentFile;
+        };
       }
     ) (lib.filterAttrs (_: runner: runner.runtime == "linux-shell") cfg.runners);
 
@@ -180,7 +191,8 @@ in
         volumes = [ "/tmp:${runner.workingDirectory}" ];
         environmentFiles = lib.optional (runner.environmentFile != null) runner.environmentFile;
         environment =
-          {
+          cfg.environment
+          // {
             ACCOUNT_UUID = runner.accountUuid;
             RUNNER_UUID = runner.runnerUuid;
             WORKING_DIRECTORY = runner.workingDirectory;
