@@ -9,7 +9,7 @@
 
 let
   cfg = config.services.bitbucket-runner;
-  bitbucketRunner = pkgs.callPackage ./package.nix { };
+  bitbucketRunner = pkgs.callPackage ./package.nix { extraPkgs = cfg.extraFHSPackages; };
 in
 {
   options.services.bitbucket-runner = {
@@ -30,7 +30,13 @@ in
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
-      description = "Packages available to runner environments";
+      description = "Packages on the runner service PATH (outside the FHS sandbox).";
+    };
+
+    extraFHSPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+      description = "Extra packages inside the linux-shell FHS sandbox.";
     };
 
     environment = lib.mkOption {

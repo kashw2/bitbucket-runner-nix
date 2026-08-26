@@ -35,7 +35,7 @@ services.bitbucket-runner = {
     pkgs.go
     pkgs.gcc
   ]; # Optional; on the runner service PATH (outside the FHS sandbox)
-  sandboxPackages = [ pkgs.jdk17 ]; # Optional; inside the linux-shell FHS sandbox
+  extraFHSPackages = [ pkgs.jdk17 ]; # Optional; inside the linux-shell FHS sandbox
   environment = { JAVA_HOME = "${pkgs.jdk17.home}"; }; # Optional; env vars set on every runner
   runners = {
     runner-1 = {
