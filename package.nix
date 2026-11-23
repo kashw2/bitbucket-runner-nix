@@ -7,10 +7,10 @@
   extraPkgs ? [ ],
 }:
 let
-  version = "7.1.0";
+  version = "7.1.3";
   src = fetchzip {
     url = "https://product-downloads.atlassian.com/software/bitbucket/pipelines/atlassian-bitbucket-pipelines-runner-${version}.tar.gz";
-    hash = "sha256-JUn6sVuXbJmPnOZAqL03ZOBuPf58Ll3JLYQ5JAD0OcQ=";
+    hash = "sha256-SdZHrFZZ0R7D2/TvG4bCn3G/++RRkTRyDrMkuXvrT0o=";
     stripRoot = false;
   };
   # the clone script that the runner generates executes a command of the form
